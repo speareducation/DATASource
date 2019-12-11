@@ -28,7 +28,9 @@ import CoreData
     private var containerURL = URL.directoryURL()
 
     private let backgroundContextName = "DATAStack.backgroundContextName"
-    
+
+    private let disposableContextName = "DATAStack.disposableContextName"
+
     private var isExcludedFromBackup = true
 
     /**
@@ -383,9 +385,13 @@ import CoreData
 
     // Can't be private, has to be internal in order to be used as a selector.
     @objc func newDisposableMainContextWillSave(_ notification: Notification) {
-        if let context = notification.object as? NSManagedObjectContext {
-            context.reset()
+        let context = notification.object as? NSManagedObjectContext
+
+        guard context?.name == disposableContextName else {
+            return
         }
+
+        context?.reset()
     }
 
     // Can't be private, has to be internal in order to be used as a selector.
